@@ -4,7 +4,7 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/CredentialManagementLib/include",
+                "${workspaceFolder}/credential_management_lib/include",
                 "${workspaceFolder}"
             ],
             "defines": [],
