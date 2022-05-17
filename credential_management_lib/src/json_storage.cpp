@@ -1,7 +1,7 @@
 #include <json_storage.hpp>
 #include <iostream>
 
-void JsonStorage::initStorage(std::string fileName)
+void JsonStorage::init(std::string fileName, spanArgs args)
 {
     fName = fileName;
     file.open(fileName, std::fstream::in | std::fstream::out);

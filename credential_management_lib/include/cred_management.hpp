@@ -11,15 +11,23 @@ class CredentialManager
     static_assert(std::is_base_of<IBaseStorage, Storage>::value, "Storage must derive from IBaseStorage");
 
 public:
-    typename std::enable_if<std::is_base_of<ILocalStorage, Storage>::value, void> initStorage(std::string fileName)
+    template <typename... Args>
+    typename std::enable_if<std::is_base_of<ILocalStorage, Storage>::value> initStorage(std::string fileName, Args... args)
     {
         storage.initStorage(fileName);
     }
 
-    typename std::enable_if<std::is_base_of<IServerStorage, Storage>::value, void> initStorage(std::string address, int port);
+    template <typename... Args>
+    typename std::enable_if<std::is_base_of<IServerStorage, Storage>::value> initStorage(std::string address, int port, Args... args);
 
-    bool insert(std::string site, std::string user, std::string password) {
+    bool insert(std::string site, std::string user, std::string password)
+    {
         return storage.insert(site, user, password);
+    }
+
+    std::string get(std::string site, std::string user)
+    {
+        return storage.getPassword(site, user);
     }
 
 private:

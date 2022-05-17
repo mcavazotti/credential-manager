@@ -7,4 +7,8 @@ add_executable(${PROJECT_NAME} ${SOURCE_LIST})
 target_include_directories(${PROJECT_NAME} PUBLIC  ${CMAKE_SOURCE_DIR}/credential_management_lib/include
                                             ${CMAKE_SOURCE_DIR}/include)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE CredentialManagementLib)
+
+find_package(Boost COMPONENTS program_options REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
+
+target_link_libraries(${PROJECT_NAME} CredentialManagementLib ${Boost_LIBRARIES})
