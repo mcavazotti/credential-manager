@@ -1,5 +1,6 @@
 #include <cred_management.hpp>
 #include <json_storage.hpp>
+#include <sqlite_storage.hpp>
 #include <boost/program_options.hpp>
 
 #include <iostream>
@@ -10,7 +11,8 @@ namespace po = boost::program_options;
 
 enum struct StorageType
 {
-    json
+    json,
+    sqlite
 };
 
 enum struct OpType
@@ -19,7 +21,7 @@ enum struct OpType
     get
 };
 
-const std::vector<std::string> storageTypeAllowedArgs{"json"};
+const std::vector<std::string> storageTypeAllowedArgs{"json", "sqlite"};
 const std::vector<std::string> operationTypeAllowedArgs{"insert", "get"};
 
 int main(int argc, char const *argv[])
@@ -31,15 +33,10 @@ int main(int argc, char const *argv[])
 
     std::string type, op, site, user, password;
 
+    std::string tableName;
+
     po::options_description desc(helpMessage);
-    desc.add_options()
-        ("help,h", "help message")
-        ("type,t", po::value<std::string>(&type)->required(), "set storage type (json)")
-        ("file,f", po::value<std::string>(), "file name")
-        ("operation,o", po::value<std::string>(&op)->required(), "operation (insert, get)")
-        ("site", po::value<std::string>(&site)->required())
-        ("user", po::value<std::string>(&user)->required())
-        ("password", po::value<std::string>(&password));
+    desc.add_options()("help,h", "help message")("type,t", po::value<std::string>(&type)->required(), "set storage type (json, sqlite)")("file,f", po::value<std::string>(), "file name")("table,T", po::value<std::string>(&tableName)->default_value("credentials"), "file name")("operation,o", po::value<std::string>(&op)->required(), "operation (insert, get)")("site", po::value<std::string>(&site)->required())("user", po::value<std::string>(&user)->required())("password", po::value<std::string>(&password));
 
     po::positional_options_description positionalArgs;
     positionalArgs.add("site", 1).add("user", 1).add("password", 1);
@@ -73,6 +70,16 @@ int main(int argc, char const *argv[])
             if (!vm.count("file"))
             {
                 throw std::runtime_error("the option '--file' is required whe storage type is json");
+            }
+            fileName = vm["file"].as<std::string>();
+        }
+
+        if (type == "sqlite")
+        {
+            storageType = StorageType::sqlite;
+            if (!vm.count("file"))
+            {
+                throw std::runtime_error("the option '--file' is required whe storage type is sqlite");
             }
             fileName = vm["file"].as<std::string>();
         }
@@ -136,6 +143,27 @@ int main(int argc, char const *argv[])
                 break;
             case OpType::get:
                 auto result = credJson.get(site, user);
+                if (result.empty())
+                    std::cout << "Not found!" << std::endl;
+                else
+                    std::cout << site + " " + user + " " + result << std::endl;
+            }
+            break;
+        }
+
+        case StorageType::sqlite:
+        {
+            CredentialManager<SqliteStorage> credSqlite;
+            credSqlite.initStorage(fileName, tableName);
+
+            switch (opType)
+            {
+            case OpType::insert:
+                if (!credSqlite.insert(site, user, password))
+                    throw std::runtime_error("failed to insert data");
+                break;
+            case OpType::get:
+                auto result = credSqlite.get(site, user);
                 if (result.empty())
                     std::cout << "Not found!" << std::endl;
                 else

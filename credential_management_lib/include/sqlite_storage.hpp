@@ -2,7 +2,8 @@
 #define SQLITE_STORAGE_HPP
 
 #include <storage_interfaces.hpp>
-#include <sqlite3.h>
+#include <SQLiteCpp/include/SQLiteCpp/SQLiteCpp.h>
+#include <memory>
 
 class SqliteStorage : public ILocalStorage
 {
@@ -15,7 +16,7 @@ public:
 
 private:
 
-    sqlite3 *db;
+    SQLite::Database db;
     std::string fileName;
     std::string table;
 };
