@@ -9,6 +9,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC  ${CMAKE_SOURCE_DIR}/credentia
 
 
 find_package(Boost COMPONENTS program_options REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
+include_directories(${Boost_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/third_party/SQLiteCpp)
 
 target_link_libraries(${PROJECT_NAME} CredentialManagementLib ${Boost_LIBRARIES} SQLiteCpp sqlite3 pthread dl)

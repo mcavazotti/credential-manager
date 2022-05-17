@@ -167,7 +167,7 @@ int main(int argc, char const *argv[])
                 if (result.empty())
                     std::cout << "Not found!" << std::endl;
                 else
-                    std::cout << site + " " + user + " " + result << std::endl;
+                    std::cout << site + "\t" + user + "\t" + result << std::endl;
             }
             break;
         }
