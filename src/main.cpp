@@ -27,8 +27,7 @@ const std::vector<std::string> operationTypeAllowedArgs{"insert", "get"};
 int main(int argc, char const *argv[])
 {
     std::string helpMessage = "Credential Manager\n"
-                              "Usage: " +
-                              std::string(argv[0]) + " --type <storage type> [storage parameters] --operation <op> <site> <user> [<password>]\n"
+                              "Usage: " + std::string(argv[0]) + " --type <storage type> [storage parameters] --operation <op> <site> <user> [<password>]\n"
                                                      "Arguments";
 
     std::string type, op, site, user, password;
@@ -36,7 +35,15 @@ int main(int argc, char const *argv[])
     std::string tableName;
 
     po::options_description desc(helpMessage);
-    desc.add_options()("help,h", "help message")("type,t", po::value<std::string>(&type)->required(), "set storage type (json, sqlite)")("file,f", po::value<std::string>(), "file name")("table,T", po::value<std::string>(&tableName)->default_value("credentials"), "file name")("operation,o", po::value<std::string>(&op)->required(), "operation (insert, get)")("site", po::value<std::string>(&site)->required())("user", po::value<std::string>(&user)->required())("password", po::value<std::string>(&password));
+    desc.add_options()
+                    ("help,h", "help message")
+                    ("type,t", po::value<std::string>(&type)->required(), "set storage type (json, sqlite)")
+                    ("file,f", po::value<std::string>(), "file name")
+                    ("table,T", po::value<std::string>(&tableName)->default_value("credentials"), "file name")
+                    ("operation,o", po::value<std::string>(&op)->required(), "operation (insert, get)")
+                    ("site", po::value<std::string>(&site)->required())
+                    ("user", po::value<std::string>(&user)->required())
+                    ("password", po::value<std::string>(&password));
 
     po::positional_options_description positionalArgs;
     positionalArgs.add("site", 1).add("user", 1).add("password", 1);
@@ -53,7 +60,7 @@ int main(int argc, char const *argv[])
 
         po::store(po::command_line_parser(argc, argv).options(desc).positional(positionalArgs).run(), vm);
         po::notify(vm);
-
+        // throw this error in order to interrupt execution flow and present help message without processing any other arguments provided
         if (vm.count("help") || argc == 1)
         {
             throw std::runtime_error("Dummy error");
@@ -113,6 +120,7 @@ int main(int argc, char const *argv[])
     }
     catch (std::exception &e)
     {
+        // if the help flag is present, ignore all commad line errors
         if (vm.count("help"))
         {
             std::cout << desc << std::endl;

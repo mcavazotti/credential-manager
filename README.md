@@ -12,3 +12,10 @@ make -C build
 ```
 Executable will be generated in `build/bin`
 
+## About security
+This program is nowhere near secure! Never use it for real!
+
+Here are some of its security flaws:
+- Passwords are typed in the command line (it means they get stored in the terminal history)
+- There is no sanitization of user input for the SQLite storage
+- Passwords are not encrypted before saving.
